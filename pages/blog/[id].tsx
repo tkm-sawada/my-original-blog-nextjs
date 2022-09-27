@@ -100,7 +100,7 @@ export default function BlogId({ blog, categories }: Props) {
             // ) : (
             //   <div dangerouslySetInnerHTML={{__html: `${content.html}`, }}/>
             // )
-            <Content content={content}/>
+            <Content content={content} key={i}/>
           ))}
 
           {/* <div className="prose" dangerouslySetInnerHTML={{__html: `${blog.content}`, }}/> */}
