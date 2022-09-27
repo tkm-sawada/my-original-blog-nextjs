@@ -1,9 +1,10 @@
 import { faFolder } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Layout from "../../components/Layout";
-import { client } from "../../libs/client";
+import { client } from "../../libs/microCMS/client";
 import PostList from "../../components/PostList";
 import { Pagination } from "../../components/Pagination";
+import { getCategoriesData, getCategoryData, getPageBlogData } from "../../libs/microCMS/api";
 
 type Props = {
   blog: any,
@@ -23,21 +24,10 @@ export const getStaticPaths = async () => {
 // SSG
 export const getStaticProps = async (context: any) => {
   const categoryId: string = context.params.categoryId;
-  const blog: any = await client.get({ endpoint: 'blog', queries: { filters: 'category[equals]' + categoryId }});
-  const category: any = await client.get({ endpoint: 'categories', contentId: categoryId });
-  const categories: any = await client.get({ endpoint: 'categories' });
-
-  // カテゴリーに対する記事数を取得
-  for(let i in categories.contents){
-    let categoryBlog = await client.get({
-      endpoint: "blog", 
-      queries: { 
-        filters: 'category[equals]' + categories.contents[i].id,
-        limit: 0
-      } 
-    });
-    categories.contents[i].count = categoryBlog.totalCount;
-  }
+  const filterText: string = 'category[equals]' + categoryId;
+  const blog: any = await getPageBlogData(0, filterText);
+  const category: any = await getCategoryData(categoryId);
+  const categories: any = await getCategoriesData();
 
   return {
     props: {
