@@ -1,9 +1,8 @@
-import { client } from "../libs/client";
 import type { NextPage } from 'next';
 import Layout from '../components/Layout';
 import { Pagination } from '../components/Pagination';
 import PostList from "../components/PostList";
-import { PER_PAGE } from "../utils/const";
+import { getPageBlogData, getCategoriesData } from "../libs/microCMS/api";
 
 type Props = {
   blog: any,
@@ -13,21 +12,9 @@ type Props = {
 
 // SSG
 export const getStaticProps = async () => {
-  const blog: any = await client.get({ endpoint: 'blog', queries: { offset: 0, limit: PER_PAGE }});
-  const categories: any = await client.get({ endpoint: 'categories', });
+  const blog: any = await getPageBlogData(0);
+  const categories: any = await getCategoriesData();
 
-  // カテゴリーに対する記事数を取得
-  for(let i in categories.contents){
-    let categoryBlog = await client.get({
-      endpoint: "blog", 
-      queries: { 
-        filters: 'category[equals]' + categories.contents[i].id,
-        limit: 0
-      } 
-    });
-    categories.contents[i].count = categoryBlog.totalCount;
-  }
-  
   return {
     props: {
       blog: blog.contents,
